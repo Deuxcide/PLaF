@@ -1,13 +1,13 @@
 (* This file defines expressed values and environments *)
 
 (* expressed values and environments are defined mutually recursively *)
-
-
 type exp_val =
   | NumVal of int
   | BoolVal of bool
   | PairVal of exp_val*exp_val
+  | ListVal of exp_val list
   | TupleVal of exp_val list
+  
 type env =
   | EmptyEnv
   | ExtendEnv of string*exp_val*env
@@ -99,6 +99,10 @@ let bool_of_boolVal : exp_val -> bool ea_result =  function
   |  BoolVal b -> return b
   | _ -> error "Expected a boolean!"
 
+let list_of_listVal: exp_val -> (exp_val list) ea_result = function
+    | ListVal l -> return l
+    | _ -> error "Expected a list!"
+
 let list_of_tupleVal : exp_val -> (exp_val list)  ea_result =  function
   |  TupleVal l -> return l
   | _ -> error "Expected a tuple!"
@@ -113,6 +117,7 @@ let rec string_of_expval = function
   | PairVal (ev1,ev2) -> "PairVal("^string_of_expval ev1
                          ^","^ string_of_expval ev2^")"
   | TupleVal evs -> "TupleVal("^String.concat "," (List.map string_of_expval evs)^")"
+  | ListVal l -> "ListVal("^String.concat "," (List.map string_of_expval l)^")"
 
 let rec string_of_env' ac = function
   | EmptyEnv ->  "["^String.concat ",\n" ac^"]"
@@ -123,3 +128,5 @@ let string_of_env : string ea_result =
   match env with
   | EmptyEnv -> Ok ">>Environment:\nEmpty"
   | _ -> Ok (">>Environment:\n"^ string_of_env' [] env)
+
+
